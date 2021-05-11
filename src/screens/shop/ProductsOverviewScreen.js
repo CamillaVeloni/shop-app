@@ -1,10 +1,33 @@
-import React from 'react'; 
+import React from 'react';
+import { Platform } from 'react-native';
+import { useSelector } from 'react-redux';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
-import ProductsList from '../../components/ProductsList';
+import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
+import ProductsList from '../../components/shop/ProductsList';
 
-const ShopScreen = () => { 
-    return ( 
-    <ProductsList title='Brecho de tudo um pouco!' />
-)};
+// Tela de Produtos ~~ Tem lógica para pegar os produtos do redux + de carregar a lista de produtos (até agora)
+// Todos os produtos
+const ProductsOverviewScreen = ({ navigation }) => {
+  const allproducts = useSelector(({ products }) => products.availableProducts);
 
-export default ShopScreen;
+  return <ProductsList productsList={allproducts} navigation={navigation} />;
+};
+
+ProductsOverviewScreen.navigationOptions = ({ navigation }) => {
+  return {
+    headerTitle: 'Todos Produtos',
+    headerRight: () => (
+      <HeaderButtons HeaderButtonComponent={DefaultHeaderBtn}>
+        <Item
+          title="Cart"
+          iconName={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
+          iconSize={25}
+          onPress={() => navigation.navigate('Cart')}
+        />
+      </HeaderButtons>
+    ),
+  };
+};
+
+export default ProductsOverviewScreen;

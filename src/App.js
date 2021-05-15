@@ -3,12 +3,14 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font';
-//import { composeWithDevTools } from 'redux-devtools-extension'
+import { LogBox } from 'react-native';
 
+//import { composeWithDevTools } from 'redux-devtools-extension'
 import ShopNavigator from './navigation/ShopNavigator';
 import RootReducer from './store/';
 
 const store = createStore(RootReducer);
+LogBox.ignoreAllLogs();
 
 export default function App() {
   let [fontLoaded] = useFonts({

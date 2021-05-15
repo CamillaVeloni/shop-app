@@ -39,6 +39,7 @@ const CartScreen = () => {
             qty={item.quantity}
             title={item.productTitle}
             amount={item.sum}
+            deletable
             onRemove={() => {
               dispatch(cartActions.removeFromCart(item.productId));
             }}
@@ -65,6 +66,10 @@ const CartScreen = () => {
     </View>
   );
 };
+
+CartScreen.navigationOptions = {
+  headerTitle: 'Meu Carrinho'
+}
 
 const styles = StyleSheet.create({
   screen: {

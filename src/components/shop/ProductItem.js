@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 14,
     fontFamily: 'mont-italic',
-    color: Colors.priceColor,
+    color: Colors.grayishColor,
   },
   detailButtons: {
     flexDirection: 'row',

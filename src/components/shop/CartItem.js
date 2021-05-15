@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DefaultBtn from '../commons/DefaultBtn';
 import DefaultText from '../commons/DefaultText';
 
-const CartItem = ({ onRemove, qty, title, amount }) => {
+const CartItem = ({ deletable, onRemove, qty, title, amount }) => {
   return (
     <View style={styles.cartItem}>
       <View style={[styles.itemData, { width: '50%'}]}>
@@ -13,13 +13,13 @@ const CartItem = ({ onRemove, qty, title, amount }) => {
       </View>
       <View style={styles.itemData}>
         <DefaultText ownStyle={styles.defaultText}>{amount.toFixed(2)} R$</DefaultText>
-        <DefaultBtn onPress={onRemove} ownBtnStyle={styles.deleteBtn}>
+        {deletable && <DefaultBtn onPress={onRemove} ownBtnStyle={styles.deleteBtn}>
           <Ionicons
             name={Platform.OS === 'android' ? 'md-trash' : 'ios-trash'}
             size={23}
             color="red"
           />
-        </DefaultBtn>
+        </DefaultBtn>}
       </View>
     </View>
   );

@@ -17,12 +17,22 @@ const ProductsOverviewScreen = ({ navigation }) => {
 ProductsOverviewScreen.navigationOptions = ({ navigation }) => {
   return {
     headerTitle: 'Todos Produtos',
+    headerLeft: () => (
+      <HeaderButtons HeaderButtonComponent={DefaultHeaderBtn}>
+        <Item
+          title="Drawer"
+          iconSize={23}
+          iconName={Platform.OS === 'android' ? 'md-menu' : 'ios-menu'}
+          onPress={() => navigation.toggleDrawer()}
+        />
+      </HeaderButtons>
+    ),
     headerRight: () => (
       <HeaderButtons HeaderButtonComponent={DefaultHeaderBtn}>
         <Item
           title="Cart"
+          iconSize={23}
           iconName={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
-          iconSize={25}
           onPress={() => navigation.navigate('Cart')}
         />
       </HeaderButtons>

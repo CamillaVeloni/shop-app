@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   Image,
   TouchableOpacity,
@@ -11,11 +10,10 @@ import {
 } from 'react-native';
 
 import DefaultText from '../commons/DefaultText';
-import DefaultBtn from '../commons/DefaultBtn';
 import Colors from '../../constants/Colors';
 
 // Card de cada produto
-const ProductItem = ({ name, image, price, onDetailPress, onAddToCart }) => {
+const ProductItem = ({ children, name, image, price, onDetailPress }) => {
   // Adicionando ripple effect para android
   let TouchableComp = TouchableOpacity;
   if (Platform.OS === 'android' && Platform.Version >= 21) TouchableComp = TouchableNativeFeedback;
@@ -30,9 +28,8 @@ const ProductItem = ({ name, image, price, onDetailPress, onAddToCart }) => {
           <DefaultText ownStyle={styles.title}>{name}</DefaultText>
           <DefaultText ownStyle={styles.price}>{price.toFixed(2)} R$</DefaultText>
         </View>
-        <View style={styles.detailButtons}>
-          <DefaultBtn onPress={onDetailPress} label='Detalhes'/>
-          <DefaultBtn onPress={onAddToCart} label='Adicionar no carrinho' />
+        <View style={styles.actionsButtons}>
+          {children}
         </View>
       </View>
     </TouchableComp>
@@ -76,7 +73,7 @@ const styles = StyleSheet.create({
     fontFamily: 'mont-italic',
     color: Colors.grayishColor,
   },
-  detailButtons: {
+  actionsButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',

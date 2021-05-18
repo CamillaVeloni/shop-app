@@ -36,6 +36,7 @@ const ProductsNavigator = createStackNavigator(
   },
   {
     navigationOptions: {
+      drawerLabel: 'Produtos',
       drawerIcon: (drawerConfig) => (
         <Ionicons
           name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
@@ -54,6 +55,7 @@ const OrdersNavigator = createStackNavigator(
   },
   {
     navigationOptions: {
+      drawerLabel: 'Pedidos',
       drawerIcon: (drawerConfig) => (
         <Ionicons
           name={Platform.OS === 'android' ? 'md-list' : 'ios-list'}
@@ -73,6 +75,7 @@ const UserNavigator = createStackNavigator(
   }, 
   {
     navigationOptions: {
+      drawerLabel: 'Conta',
       drawerIcon: (drawerConfig) => (
         <Ionicons
           name={Platform.OS === 'android' ? 'md-create' : 'ios-create'}

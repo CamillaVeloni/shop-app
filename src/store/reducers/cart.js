@@ -1,6 +1,7 @@
 import CartItem from '../../models/cart-item';
 import { ADD_TO_CART, REMOVE_ITEM } from '../actions/cart';
 import { NEW_ORDER } from '../actions/order';
+import { DELETE_USER_PRODUCT } from '../actions/products';
 
 const INITIAL_STATE = {
   items: {},
@@ -54,6 +55,19 @@ export default (state = INITIAL_STATE, action) => {
         items: updatedCart,
         totalAmount: Math.abs(state.totalAmount - selectedItem.productPrice),
       };
+    case DELETE_USER_PRODUCT:
+      if(!state.items[action.payload]) {
+        // SE o item não tiver no carrinho então só retorna o state, sem mudar nada.
+        return state;
+      }
+      const updatedItems = { ...state.items };
+      const totalItem = updatedItems[action.payload].sum;
+      delete updatedItems[action.payload];
+      return {
+        ...state,
+        items: updatedItems,
+        totalAmount: state.totalAmount - totalItem,
+      }
     case NEW_ORDER:
       return INITIAL_STATE;
     default:

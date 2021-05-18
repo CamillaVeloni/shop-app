@@ -29,7 +29,7 @@ const EditProductScreen = ({ navigation }) => {
     editedProduct ? editedProduct.description : ''
   );
 
-  const submitHandler = useCallback(() => {
+  const submitHandler = useCallback(() => { // dispatch criar ou editar produto
     if (editedProduct) {
       // Está no modo editar
       dispatch(
@@ -40,6 +40,7 @@ const EditProductScreen = ({ navigation }) => {
         productsActions.createProduct(title, description, imageUrl, +price)
       );
     }
+    navigation.goBack(); // navegar para Meus Produtos
   }, [dispatch, id, title, imageUrl, price, description]);
 
   // Setando action para header pelo setParams

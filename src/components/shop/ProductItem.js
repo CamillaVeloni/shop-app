@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 
+import Card from '../commons/Card';
 import DefaultText from '../commons/DefaultText';
 import Colors from '../../constants/Colors';
 
@@ -19,8 +20,9 @@ const ProductItem = ({ children, name, image, price, onDetailPress }) => {
   if (Platform.OS === 'android' && Platform.Version >= 21) TouchableComp = TouchableNativeFeedback;
 
   return (
+    <Card style={styles.containerItem}>
     <TouchableComp onPress={onDetailPress} useForeground>
-      <View style={styles.containerItem}>
+      <View>
         <View style={styles.imageContainer}>
           <Image source={{ uri: image }} style={styles.image} />
         </View>
@@ -33,19 +35,13 @@ const ProductItem = ({ children, name, image, price, onDetailPress }) => {
         </View>
       </View>
     </TouchableComp>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   containerItem: {
     height: Dimensions.get('window').height >= 600 ? 300 : 250,
-    shadowColor: 'black',
-    shadowOpacity: 0.26,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-    borderRadius: 10,
-    backgroundColor: 'white',
     marginVertical: 10,
     marginHorizontal: 15,
     overflow: 'hidden',

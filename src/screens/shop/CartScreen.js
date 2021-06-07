@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import * as cartActions from '../../store/actions/cart';
 import * as ordersActions from '../../store/actions/order';
+import Card from '../../components/commons/Card';
 import CartItem from '../../components/shop/CartItem';
 import DefaultBtn from '../../components/commons/DefaultBtn';
 import DefaultText from '../../components/commons/DefaultText';
@@ -46,7 +47,7 @@ const CartScreen = () => {
           />
         )}
       />
-      <View style={styles.containerCart}>
+      <Card style={styles.containerCart}>
         <DefaultText ownStyle={styles.orderTextTotal}>
           Total do pedido:{' '}
           <DefaultText ownStyle={styles.orderTotal}>
@@ -62,7 +63,7 @@ const CartScreen = () => {
           ownStyle={styles.orderTextBtn}
           ownBtnStyle={styles.orderBtn}
         />
-      </View>
+      </Card>
     </View>
   );
 };
@@ -79,13 +80,6 @@ const styles = StyleSheet.create({
   containerCart: {
     padding: 5,
     marginBottom: 10,
-    borderRadius: 10,
-    shadowColor: 'black',
-    shadowOpacity: 0.26,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-    backgroundColor: 'white',
   },
   orderBtn: {
     margin: 10,

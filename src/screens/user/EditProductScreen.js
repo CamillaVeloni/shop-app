@@ -1,17 +1,44 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useReducer } from 'react';
 import {
+  KeyboardAvoidingView,
   View,
   StyleSheet,
   ScrollView,
-  TextInput,
   Platform,
+  Alert,
 } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
 
 import * as productsActions from '../../store/actions/products';
 import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
-import DefaultText from '../../components/commons/DefaultText';
+import Input from '../../components/commons/Input';
+
+const FORM_INPUT_UPDATE = 'update';
+
+const formReducer = (state, action) => {
+  if (action.type === FORM_INPUT_UPDATE) {
+    const updatedValues = {
+      ...state.inputValues,
+      [action.input]: action.value,
+    };
+    const updatedValidities = {
+      ...state.inputValidities,
+      [action.input]: action.isValid,
+    };
+    let updatedFormIsValid = true; // se o valor for 'overrided' então não volta a ser true
+    for (const key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key]; // updatedValidities[key] SE for falso então o form não tá valido
+    }
+
+    return {
+      formIsValid: updatedFormIsValid,
+      inputValues: updatedValues,
+      inputValidities: updatedValidities,
+    };
+  }
+  return state;
+};
 
 const EditProductScreen = ({ navigation }) => {
   const id = navigation.getParam('productId');
@@ -20,74 +47,137 @@ const EditProductScreen = ({ navigation }) => {
   );
   const dispatch = useDispatch();
 
-  const [title, setTitle] = useState(editedProduct ? editedProduct.title : '');
-  const [imageUrl, setImageUrl] = useState(
-    editedProduct ? editedProduct.imageUrl : ''
-  );
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState(
-    editedProduct ? editedProduct.description : ''
-  );
+  const [formState, dispatchFormState] = useReducer(formReducer, {
+    // formulário reducer
+    inputValues: {
+      title: editedProduct ? editedProduct.title : '',
+      description: editedProduct ? editedProduct.description : '',
+      imageUrl: editedProduct ? editedProduct.imageUrl : '',
+      price: '',
+    },
+    inputValidities: {
+      title: editedProduct ? true : false,
+      description: editedProduct ? true : false,
+      imageUrl: editedProduct ? true : false,
+      price: editedProduct ? true : false,
+    },
+    formIsValid: editedProduct ? true : false,
+  });
 
-  const submitHandler = useCallback(() => { // dispatch criar ou editar produto
+  const submitHandler = useCallback(() => {
+    // dispatch criar ou editar produto
+    if (!formState.formIsValid) {
+      // verificando validação do formulário
+      Alert.alert(
+        'Erro na validação',
+        'Por favor, verifique os erros no formulário.',
+        [{ text: 'Ok' }]
+      );
+      return;
+    }
     if (editedProduct) {
       // Está no modo editar
       dispatch(
-        productsActions.updateProduct(id, title, description, imageUrl)
+        productsActions.updateProduct(
+          id,
+          formState.inputValues.title,
+          formState.inputValues.description,
+          formState.inputValues.imageUrl
+        )
       );
     } else {
       dispatch(
-        productsActions.createProduct(title, description, imageUrl, +price)
+        productsActions.createProduct(
+          formState.inputValues.title,
+          formState.inputValues.description,
+          formState.inputValues.imageUrl,
+          +formState.inputValues.price
+        )
       );
     }
     navigation.goBack(); // navegar para Meus Produtos
-  }, [dispatch, id, title, imageUrl, price, description]);
+  }, [dispatch, id, formState]);
 
   // Setando action para header pelo setParams
   useEffect(() => {
     navigation.setParams({ submit: submitHandler });
   }, [submitHandler]);
 
+  // Função para usar o reducer dispatch ~~ ver: textInput
+  const inputChangeHandler = useCallback(
+    (inputIdentifier, inputValue, inputValidity) => {
+      console.log(inputValue);
+      dispatchFormState({
+        type: FORM_INPUT_UPDATE,
+        value: inputValue,
+        isValid: inputValidity,
+        input: inputIdentifier,
+      });
+    },
+    [dispatchFormState]
+  );
+
   return (
-    <ScrollView>
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <DefaultText ownStyle={styles.label}>Digite o nome do produto:</DefaultText>
-          <TextInput
-            style={styles.input}
-            value={title}
-            onChangeText={(t) => setTitle(t)}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={Platform.select({ ios: 0, android: 500 })}
+    >
+      <ScrollView>
+        <View style={styles.form}>
+          <Input
+            id="title"
+            label="Digite o titulo do produto:"
+            errorText="Por favor, digite um titulo válido"
+            keyboardType="default"
+            autoCapitalize="sentences"
+            autoCorrect
+            returnKeyType="next"
+            onInputChange={inputChangeHandler}
+            required
+            initialValue={editedProduct ? editedProduct.title : ''}
+            initiallyValid={!!editedProduct}
           />
-        </View>
-        <View style={styles.formControl}>
-          <DefaultText ownStyle={styles.label}>Digite a imagem URL do produto:</DefaultText>
-          <TextInput
-            style={styles.input}
-            value={imageUrl}
-            onChangeText={(t) => setImageUrl(t)}
+          <Input
+            id="imageUrl"
+            label="Digite a url da imagem do produto:"
+            errorText="Por favor, digite uma url válida"
+            keyboardType="default"
+            returnKeyType="next"
+            onInputChange={inputChangeHandler}
+            required
+            initialValue={editedProduct ? editedProduct.imageUrl : ''}
+            initiallyValid={!!editedProduct}
           />
-        </View>
-        {!editedProduct && (
-          <View style={styles.formControl}>
-            <DefaultText ownStyle={styles.label}>Digite o preço do produto:</DefaultText>
-            <TextInput
-              keyboardType="numeric"
-              style={styles.input}
-              value={price}
-              onChangeText={(t) => setPrice(t)}
+          {!editedProduct && (
+            <Input
+              id="price"
+              label="Digite o preço do produto:"
+              errorText="Por favor, digite um preço válido"
+              keyboardType="decimal-pad"
+              returnKeyType="next"
+              onInputChange={inputChangeHandler}
+              required
+              min={0.1}
             />
-          </View>
-        )}
-        <View style={styles.formControl}>
-          <DefaultText ownStyle={styles.label}>Digite uma descrição do produto:</DefaultText>
-          <TextInput
-            style={styles.input}
-            value={description}
-            onChangeText={(t) => setDescription(t)}
+          )}
+          <Input
+            id="description"
+            label="Digite uma descrição do produto:"
+            errorText="Por favor, digite uma descrição válida"
+            keyboardType="default"
+            autoCorrect
+            multiline
+            numberOfLines={3}
+            onInputChange={inputChangeHandler}
+            initialValue={editedProduct ? editedProduct.description : ''}
+            initiallyValid={!!editedProduct}
+            required
+            minLength={5}
           />
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -117,18 +207,6 @@ EditProductScreen.navigationOptions = ({ navigation }) => {
 const styles = StyleSheet.create({
   form: {
     margin: 20,
-  },
-  formControl: {
-    width: '100%',
-  },
-  label: {
-    marginVertical: 8,
-  },
-  input: {
-    paddingHorizontal: 2,
-    paddingVertical: 5,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
   },
 });
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import ReduxThunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import AppLoading from 'expo-app-loading';
 import { useFonts } from 'expo-font';
@@ -9,7 +10,7 @@ import { LogBox } from 'react-native';
 import ShopNavigator from './navigation/ShopNavigator';
 import RootReducer from './store/';
 
-const store = createStore(RootReducer);
+const store = createStore(RootReducer, applyMiddleware(ReduxThunk));
 LogBox.ignoreAllLogs();
 
 export default function App() {

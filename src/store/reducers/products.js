@@ -4,19 +4,25 @@ import {
   CREATE_USER_PRODUCT,
   UPDATE_USER_PRODUCT,
   DELETE_USER_PRODUCT,
+  SET_PRODUCTS,
 } from '../actions/products';
 
 const INITIAL_STATE = {
-  availableProducts: PRODUCTS,
-  userProducts: PRODUCTS.filter((prod) => prod.ownerId === 'u1'),
+  availableProducts: [],
+  userProducts: [],
 };
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case SET_PRODUCTS:
+      return {
+        availableProducts: action.payload,
+        userProducts: action.payload.filter((prod) => prod.ownerId === 'u1'),
+      }
     case CREATE_USER_PRODUCT:
       const { title, imageUrl, description, price } = action.payload;
       const newProduct = new Product(
-        new Date().toString(),
+        action.payload.id,
         'u1',
         title,
         imageUrl,

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
+import * as productsActions from '../../store/actions/products';
 import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
 import ProductsList from '../../components/shop/ProductsList';
 
@@ -10,6 +11,11 @@ import ProductsList from '../../components/shop/ProductsList';
 // Todos os produtos
 const ProductsOverviewScreen = ({ navigation }) => {
   const allproducts = useSelector(({ products }) => products.availableProducts);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(productsActions.fetchProducts());
+  }, [dispatch]);
 
   return <ProductsList productsList={allproducts} navigation={navigation} />;
 };

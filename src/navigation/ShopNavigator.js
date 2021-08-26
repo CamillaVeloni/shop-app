@@ -37,13 +37,13 @@ const ProductsNavigator = createStackNavigator(
   {
     navigationOptions: {
       drawerLabel: 'Produtos',
-      drawerIcon: (drawerConfig) => (
+      drawerIcon: drawerConfig => (
         <Ionicons
           name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
           size={23}
           color={drawerConfig.tintColor}
         />
-      ),
+      )
     },
     defaultNavigationOptions: defaultNavigationStyle,
   }
@@ -75,7 +75,7 @@ const UserNavigator = createStackNavigator(
   }, 
   {
     navigationOptions: {
-      drawerLabel: 'Conta',
+      drawerLabel: 'Meus Produtos',
       drawerIcon: (drawerConfig) => (
         <Ionicons
           name={Platform.OS === 'android' ? 'md-create' : 'ios-create'}

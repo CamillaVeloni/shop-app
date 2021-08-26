@@ -106,7 +106,6 @@ const EditProductScreen = ({ navigation }) => {
   // Função para usar o reducer dispatch ~~ ver: textInput
   const inputChangeHandler = useCallback(
     (inputIdentifier, inputValue, inputValidity) => {
-      console.log(inputValue);
       dispatchFormState({
         type: FORM_INPUT_UPDATE,
         value: inputValue,

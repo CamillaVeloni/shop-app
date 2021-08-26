@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Text, StyleSheet, Platform } from 'react-native';
+import { FlatList, StyleSheet, Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import { useSelector } from 'react-redux';
@@ -31,7 +31,7 @@ OrdersScreen.navigationOptions = ({ navigation }) => {
     headerLeft: () => (
       <HeaderButtons HeaderButtonComponent={DefaultHeaderBtn}>
         <Item
-          title="Drawer"
+          title="Menu"
           iconName={Platform.OS === 'android' ? 'md-menu' : 'ios-menu'}
           iconSize={23}
           onPress={() => navigation.toggleDrawer()}

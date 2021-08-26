@@ -18,7 +18,7 @@ const OrderItem = ({ amount, date, items }) => {
       </View>
       <DefaultBtn
         label={showDetails ? "Ocultar Informações" : "Mais Informações"}
-        onPress={() => setShowDetails((prevState) => !prevState)}
+        onPress={() => setShowDetails((prevState) => !prevState)} // mudando o state anterior ex: (true) => !true <- fica false
       />
       {showDetails && (
         <View style={styles.orderDetails}>

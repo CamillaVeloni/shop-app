@@ -1,4 +1,3 @@
-import PRODUCTS from '../../data/dummy-data';
 import Product from '../../models/Product';
 import {
   CREATE_USER_PRODUCT,

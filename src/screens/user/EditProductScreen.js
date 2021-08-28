@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from 'react';
+import React, { useState, useEffect, useCallback, useReducer } from 'react';
 import {
   KeyboardAvoidingView,
   View,
@@ -41,6 +41,8 @@ const formReducer = (state, action) => {
 };
 
 const EditProductScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState();
+
   const id = navigation.getParam('productId');
   const editedProduct = useSelector(({ products }) =>
     products.userProducts.find((prod) => prod.id === id)
@@ -64,10 +66,10 @@ const EditProductScreen = ({ navigation }) => {
     formIsValid: editedProduct ? true : false,
   });
 
+  // FUNÇÃO para criar ou editar produto
   const submitHandler = useCallback(() => {
-    // dispatch criar ou editar produto
+    // verificando validação do formulário
     if (!formState.formIsValid) {
-      // verificando validação do formulário
       Alert.alert(
         'Erro na validação',
         'Por favor, verifique os erros no formulário.',
@@ -75,6 +77,8 @@ const EditProductScreen = ({ navigation }) => {
       );
       return;
     }
+
+    // verificando se está no modo criar ou editar
     if (editedProduct) {
       // Está no modo editar
       dispatch(

@@ -1,3 +1,4 @@
+import { BASE_URL } from '../../config';
 import Product from '../../models/Product';
 
 export const DELETE_USER_PRODUCT = 'deleteUserProduct';
@@ -9,7 +10,7 @@ export const fetchProducts = () => {
   return async (dispatch) => {
     try {
       const response = await fetch(
-        'https://shop-app-f3a35-default-rtdb.firebaseio.com/products.json'
+        `${BASE_URL}/products.json`
       );
 
       if (!response.ok) {
@@ -48,7 +49,7 @@ export const fetchProducts = () => {
 export const deleteUserProduct = (productId) => {
   return async (dispatch) => {
     await fetch(
-      `https://shop-app-f3a35-default-rtdb.firebaseio.com/products/${productId}.json`,
+      `${BASE_URL}/products/${productId}.json`,
       {
         method: 'DELETE',
       }
@@ -64,7 +65,7 @@ export const deleteUserProduct = (productId) => {
 export const createProduct = (title, description, imageUrl, price) => {
   return async (dispatch) => {
     const response = await fetch(
-      'https://shop-app-f3a35-default-rtdb.firebaseio.com/products.json',
+      `${BASE_URL}/products.json`,
       {
         method: 'POST',
         headers: {
@@ -98,7 +99,7 @@ export const updateProduct = (id, title, description, imageUrl) => {
   // method: 'PATCH' ~~ vai atualizar no local que você colocar (body)
   return async (dispatch) => {
     await fetch(
-      `https://shop-app-f3a35-default-rtdb.firebaseio.com/products/${id}.json`,
+      `${BASE_URL}/products/${id}.json`,
       {
         method: 'PATCH',
         headers: {

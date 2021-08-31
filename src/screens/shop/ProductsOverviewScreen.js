@@ -13,6 +13,7 @@ import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
 import ProductsList from '../../components/shop/ProductsList';
 import DefaultBtn from '../../components/commons/DefaultBtn';
 import Spinner from '../../components/commons/Spinner';
+import EmptyComponent from '../../components/shop/EmptyComponent';
 
 // Tela de Produtos ~~ Tem lógica para pegar os produtos do redux + de carregar a lista de produtos (até agora)
 // Todos os produtos
@@ -59,12 +60,7 @@ const ProductsOverviewScreen = ({ navigation }) => {
   // Mostrar erro
   if (error) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.defaultText}>
-          Um erro aconteceu! Tente outra vez mais tarde.
-        </Text>
-        <DefaultBtn label="Tentar denovo" onPress={loadProducts} />
-      </View>
+      <EmptyComponent text={error} />
     );
   }
   // Mostrando spinner enquanto estiver esperando resposta do firebae
@@ -73,9 +69,7 @@ const ProductsOverviewScreen = ({ navigation }) => {
   // Mostrar mensagem se não tiver nenhum produto
   if (!loading && allproducts.length === 0) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.defaultText}>Nenhum produto achado!</Text>
-      </View>
+      <EmptyComponent text='Nenhum produto encontrado!' />
     );
   }
 

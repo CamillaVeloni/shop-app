@@ -1,13 +1,49 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import * as orderActions from '../../store/actions/order';
 import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
 import OrderItem from '../../components/shop/OrderItem';
+import Spinner from '../../components/commons/Spinner';
+import EmptyComponent from '../../components/shop/EmptyComponent';
 
 const OrdersScreen = () => {
+  const [loading, setLoading] = useState();
+  const [error, setError] = useState();
+
+  const dispatch = useDispatch();
+
   const userOrders = useSelector(({ order }) => order.orders);
+
+  const loadOrders = useCallback(async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await dispatch(orderActions.fetchOrders());
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setLoading(false);
+  }, [dispatch]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders, dispatch]);
+
+  console.log(userOrders);
+
+  if (loading) return <Spinner />;
+
+  if (!loading && error) {
+    return <EmptyComponent text={error} />;
+  }
+  if (!loading && userOrders.length === 0) {
+    return <EmptyComponent text="Você ainda não fez nenhum pedido!" />;
+  }
+
   return (
     <FlatList
       data={userOrders}

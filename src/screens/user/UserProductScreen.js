@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Alert } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
@@ -7,10 +7,20 @@ import * as productsActions from '../../store/actions/products';
 import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
 import DefaultBtn from '../../components/commons/DefaultBtn';
 import ProductItem from '../../components/shop/ProductItem';
+import Spinner from '../../components/commons/Spinner';
 
 const UserProductScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
+
   const userProducts = useSelector(({ products }) => products.userProducts);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Um erro aconteceu!', error, [{ text: 'Okay' }]);
+    }
+  }, [error]);
 
   const deleteHandler = (id) => {
     Alert.alert(
@@ -21,7 +31,17 @@ const UserProductScreen = ({ navigation }) => {
         {
           text: 'Sim',
           style: 'destructive',
-          onPress: () => dispatch(productsActions.deleteUserProduct(id)),
+          onPress: async () => {
+            setError(null);
+            setLoading(true);
+            try {
+              await dispatch(productsActions.deleteUserProduct(id));
+            } catch (error) {
+              setError(error.message);
+            }
+
+            setLoading(false);
+          },
         },
       ]
     );
@@ -29,6 +49,9 @@ const UserProductScreen = ({ navigation }) => {
 
   const editProductHandler = (id) =>
     navigation.navigate('EditProduct', { productId: id });
+
+  // Mostrando spinner
+  if (loading) return <Spinner />;
 
   return (
     <FlatList

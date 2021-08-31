@@ -6,6 +6,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,6 +14,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as productsActions from '../../store/actions/products';
 import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
 import Input from '../../components/commons/Input';
+import Colors from '../../constants/Colors';
+import Spinner from '../../components/commons/Spinner';
 
 const FORM_INPUT_UPDATE = 'update';
 
@@ -41,7 +44,8 @@ const formReducer = (state, action) => {
 };
 
 const EditProductScreen = ({ navigation }) => {
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
 
   const id = navigation.getParam('productId');
   const editedProduct = useSelector(({ products }) =>
@@ -66,8 +70,15 @@ const EditProductScreen = ({ navigation }) => {
     formIsValid: editedProduct ? true : false,
   });
 
+  // useEffect para mostrar alerta com erro
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Um erro aconteceu!', error, [{ text: 'Okay' }]);
+    }
+  }, [error]);
+
   // FUNÇÃO para criar ou editar produto
-  const submitHandler = useCallback(() => {
+  const submitHandler = useCallback(async () => {
     // verificando validação do formulário
     if (!formState.formIsValid) {
       Alert.alert(
@@ -78,28 +89,38 @@ const EditProductScreen = ({ navigation }) => {
       return;
     }
 
-    // verificando se está no modo criar ou editar
-    if (editedProduct) {
-      // Está no modo editar
-      dispatch(
-        productsActions.updateProduct(
-          id,
-          formState.inputValues.title,
-          formState.inputValues.description,
-          formState.inputValues.imageUrl
-        )
-      );
-    } else {
-      dispatch(
-        productsActions.createProduct(
-          formState.inputValues.title,
-          formState.inputValues.description,
-          formState.inputValues.imageUrl,
-          +formState.inputValues.price
-        )
-      );
+    setError(null);
+    setLoading(true);
+    // verificando se possui algum erro na requisição
+    try {
+      // verificando se está no modo criar ou editar
+      if (editedProduct) {
+        // Está no modo editar
+        await dispatch(
+          productsActions.updateProduct(
+            id,
+            formState.inputValues.title,
+            formState.inputValues.description,
+            formState.inputValues.imageUrl
+          )
+        );
+      } else {
+        await dispatch(
+          productsActions.createProduct(
+            formState.inputValues.title,
+            formState.inputValues.description,
+            formState.inputValues.imageUrl,
+            +formState.inputValues.price
+          )
+        );
+      }
+
+      navigation.goBack(); // navegar para 'Meus Produtos'
+    } catch (error) {
+      setError(error.message); // setando o erro para mostrar na tela!
     }
-    navigation.goBack(); // navegar para Meus Produtos
+
+    setLoading(false); // retirando o spinner!
   }, [dispatch, id, formState]);
 
   // Setando action para header pelo setParams
@@ -119,6 +140,9 @@ const EditProductScreen = ({ navigation }) => {
     },
     [dispatchFormState]
   );
+
+  // Mostrando spinner
+  if (loading) return <Spinner />;
 
   return (
     <KeyboardAvoidingView
@@ -210,6 +234,10 @@ EditProductScreen.navigationOptions = ({ navigation }) => {
 const styles = StyleSheet.create({
   form: {
     margin: 20,
+  },
+  defaultText: {
+    fontFamily: 'mont-regular',
+    fontSize: 15,
   },
 });
 

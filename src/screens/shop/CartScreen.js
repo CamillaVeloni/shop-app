@@ -1,5 +1,11 @@
-import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import * as cartActions from '../../store/actions/cart';
@@ -11,6 +17,9 @@ import DefaultText from '../../components/commons/DefaultText';
 import Colors from '../../constants/Colors';
 
 const CartScreen = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
+
   const cartTotalAmount = useSelector(({ cart }) => cart.totalAmount); // Pegando o preço final do carrinho
   const cartItems = useSelector(({ cart: { items } }) => {
     // Pegando os items do carrinho
@@ -25,10 +34,28 @@ const CartScreen = () => {
         sum: items[key].sum,
       });
     }
-    // Usando sort para ajeitar ordem pelo id 
+    // Usando sort para ajeitar ordem pelo id
     return transformedCart.sort((a, b) => (a.productId > b.productId ? 1 : -1));
   });
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('', error, [{ text: 'Okay' }]);
+    }
+  }, [error]);
+
+  const sendOrderHandler = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await dispatch(ordersActions.addOrder(cartItems, cartTotalAmount));
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setLoading(false);
+  };
 
   return (
     <View style={styles.screen}>
@@ -54,23 +81,25 @@ const CartScreen = () => {
             {cartTotalAmount.toFixed(2)} R$
           </DefaultText>
         </DefaultText>
-        <DefaultBtn
-          onPress={() => {
-            dispatch(ordersActions.addOrder(cartItems, cartTotalAmount))
-          }}
-          disabled={cartItems.length === 0}
-          label="Fazer o pedido"
-          ownStyle={styles.orderTextBtn}
-          ownBtnStyle={styles.orderBtn}
-        />
+        {loading ? (
+          <ActivityIndicator size='small' color={Colors.primaryColor} />
+        ) : (
+          <DefaultBtn
+            onPress={sendOrderHandler}
+            disabled={cartItems.length === 0}
+            label="Fazer o pedido"
+            ownStyle={styles.orderTextBtn}
+            ownBtnStyle={styles.orderBtn}
+          />
+        )}
       </Card>
     </View>
   );
 };
 
 CartScreen.navigationOptions = {
-  headerTitle: 'Meu Carrinho'
-}
+  headerTitle: 'Meu Carrinho',
+};
 
 const styles = StyleSheet.create({
   screen: {

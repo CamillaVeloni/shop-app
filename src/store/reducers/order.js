@@ -10,12 +10,12 @@ export default (state = INITIAL_STATE, action) => {
     // Novo pedido: puxar do actionOrder o payload com items e totalAmount. Criar um novo pedido com modelo (ver: src/models/order.js). 
     //Retornar novo array com novo pedido
     case NEW_ORDER: 
-      const { items, amount } = action.payload;
+      const { id, items, amount, date } = action.payload;
       const newOrder = new Order(
-        new Date().toString(),
+        id,
         items,
         amount,
-        new Date()
+        date
       );
       return { ...state, orders: state.orders.concat(newOrder)}
     default:

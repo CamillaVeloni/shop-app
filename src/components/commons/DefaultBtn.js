@@ -37,6 +37,7 @@ const DefaultBtn = ({
 const styles = StyleSheet.create({
   buttonWrapper: {
     padding: 10,
+    marginVertical: 5,
     backgroundColor: Colors.accentColor,
     borderRadius: 20,
     alignItems: 'center',

@@ -19,7 +19,6 @@ export const fetchProducts = () => {
         );
       }
       const data = await response.json();
-      //console.log(data);
 
       // transformando data recebido (objeto) em array
       let arrayData = [];

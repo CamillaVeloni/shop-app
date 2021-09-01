@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Platform,
-  View,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import { Platform, StyleSheet, FlatList } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import * as productsActions from '../../store/actions/products';
+import * as cartActions from '../../store/actions/cart';
 import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
-import ProductsList from '../../components/shop/ProductsList';
+import ProductItem from '../../components/shop/ProductItem';
 import DefaultBtn from '../../components/commons/DefaultBtn';
 import Spinner from '../../components/commons/Spinner';
 import EmptyComponent from '../../components/shop/EmptyComponent';
@@ -20,8 +16,9 @@ import EmptyComponent from '../../components/shop/EmptyComponent';
 const ProductsOverviewScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  // state para spinner (enquanto espera produtos da database) e para mensagem de erro
+  // state para loading inicial (enquanto espera produtos da database), refresh e para mensagem de erro
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState();
 
   // pegando os produtos do redux
@@ -30,13 +27,14 @@ const ProductsOverviewScreen = ({ navigation }) => {
   // Função de fetch os produtos
   const loadProducts = useCallback(async () => {
     setError(null);
-    setLoading(true);
+    setRefreshing(true);
     try {
       await dispatch(productsActions.fetchProducts());
     } catch (error) {
       setError(error.message);
     }
-    setLoading(false);
+
+    setRefreshing(false);
   }, [setError, setLoading, dispatch]);
 
   // Criando um listener para eventos de navegação ~~ atualizar produtos (loadProducts)
@@ -52,28 +50,68 @@ const ProductsOverviewScreen = ({ navigation }) => {
     };
   }, [loadProducts]);
 
-  // UseEffect para usar função loadProducts
+  // UseEffect para usar função loadProducts ~~ loading inicial
   useEffect(() => {
-    loadProducts();
+    setLoading(true);
+    loadProducts().then(() => {
+      setLoading(false);
+    });
   }, [dispatch, loadProducts]);
 
   // Mostrar erro
   if (error) {
-    return (
-      <EmptyComponent text={error} />
-    );
+    return <EmptyComponent text={error} />;
   }
   // Mostrando spinner enquanto estiver esperando resposta do firebae
   if (loading) return <Spinner />;
 
   // Mostrar mensagem se não tiver nenhum produto
   if (!loading && allproducts.length === 0) {
-    return (
-      <EmptyComponent text='Nenhum produto encontrado!' />
-    );
+    return <EmptyComponent text="Nenhum produto encontrado!" />;
   }
 
-  return <ProductsList productsList={allproducts} navigation={navigation} />;
+  // Navivegar para delalhes do produto ~~ usado em RenderItem
+  const detailsItemHandler = (id, title) => {
+    navigation.navigate('ProductDetail', {
+      productId: id,
+      title: title,
+    });
+  };
+
+  // Renderiza o componente ProductItem ~~ card de cada item
+  const RenderItem = ({ item }) => {
+    return (
+      <ProductItem
+        name={item.title}
+        image={item.imageUrl}
+        price={item.price}
+        onDetailPress={() => detailsItemHandler(item.id, item.title)}
+      >
+        <DefaultBtn
+          onPress={() => detailsItemHandler(item.id, item.title)}
+          label="Detalhes"
+        />
+        <DefaultBtn
+          onPress={() => {
+            dispatch(cartActions.addToCart(item));
+          }}
+          label="Adicionar no carrinho"
+        />
+      </ProductItem>
+    );
+  };
+
+  return (
+    <FlatList
+      onRefresh={loadProducts}
+      refreshing={refreshing}
+      data={allproducts}
+      keyExtractor={(item) => item.id}
+      showsVerticalScrollIndicator={false}
+      renderItem={RenderItem}
+      style={{ width: '100%' }}
+    />
+  );
 };
 
 ProductsOverviewScreen.navigationOptions = ({ navigation }) => {

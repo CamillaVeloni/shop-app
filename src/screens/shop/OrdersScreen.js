@@ -33,8 +33,6 @@ const OrdersScreen = () => {
     loadOrders();
   }, [loadOrders, dispatch]);
 
-  console.log(userOrders);
-
   if (loading) return <Spinner />;
 
   if (!loading && error) {

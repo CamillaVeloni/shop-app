@@ -40,7 +40,9 @@ const Input = (props) => {
     /* if (inputState.touched) {
       onInputChange(id, inputState.value, inputState.isValid);
     } */
-    onInputChange(id, inputState.value, inputState.isValid);
+    if (inputState.touched || inputState.value.length != 0) {
+      onInputChange(id, inputState.value, inputState.isValid);
+    }
   }, [id, inputState, onInputChange]);
 
   /*
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    marginVertical: 8,
+    marginVertical: 10,
     fontFamily: 'mont-bold',
   },
   validateText: {
@@ -117,6 +119,7 @@ const styles = StyleSheet.create({
   input: {
     paddingHorizontal: 2,
     paddingVertical: 5,
+    margin: 5,
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
   },

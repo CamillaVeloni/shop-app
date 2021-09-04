@@ -1,4 +1,4 @@
-import { BASE_URL } from '../../config';
+import { firebaseConfig } from '../../config';
 import Product from '../../models/Product';
 
 export const DELETE_USER_PRODUCT = 'deleteUserProduct';
@@ -10,7 +10,7 @@ export const fetchProducts = () => {
   return async (dispatch) => {
     try {
       // fetching data da API, verificando resposta e transformando de JSON para objeto javascript
-      const response = await fetch(`${BASE_URL}/products.json`);
+      const response = await fetch(`${firebaseConfig.databaseURL}/products.json`);
       if (!response.ok) {
         // Pegando erro
         // pode também ver o que deu errado no container do response (body)
@@ -50,7 +50,7 @@ export const fetchProducts = () => {
 
 export const deleteUserProduct = (productId) => {
   return async (dispatch) => {
-    const response = await fetch(`${BASE_URL}/products/${productId}.json`, {
+    const response = await fetch(`${firebaseConfig.databaseURL}/products/${productId}.json`, {
       method: 'DELETE',
     });
 
@@ -69,7 +69,7 @@ export const deleteUserProduct = (productId) => {
 export const createProduct = (title, description, imageUrl, price) => {
   return async (dispatch) => {
     // Usando fetch para conectar com API
-    const response = await fetch(`${BASE_URL}/products.json`, {
+    const response = await fetch(`${firebaseConfig.databaseURL}/products.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const updateProduct = (id, title, description, imageUrl) => {
   // method: 'PUT' ~~ vai 'override' o resource com o novo data
   // method: 'PATCH' ~~ vai atualizar no local que você colocar (body)
   return async (dispatch) => {
-    const response = await fetch(`${BASE_URL}/products/${id}.json`, {
+    const response = await fetch(`${firebaseConfig.databaseURL}/products/${id}.json`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

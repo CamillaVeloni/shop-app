@@ -10,8 +10,8 @@ export default (state = INITIAL_STATE, action) => {
     switch(action.type) {
         case STORING_USER:
             return {
-                token: action.payload.token,
-                userId: action.payload.userId,
+                token: action.token,
+                userId: action.userId,
             }
         default: 
             return state;

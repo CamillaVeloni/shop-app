@@ -105,8 +105,10 @@ export const createProduct = (title, description, imageUrl, price) => {
 export const updateProduct = (id, title, description, imageUrl) => {
   // method: 'PUT' ~~ vai 'override' o resource com o novo data
   // method: 'PATCH' ~~ vai atualizar no local que você colocar (body)
-  return async (dispatch) => {
-    const response = await fetch(`${firebaseConfig.databaseURL}/products/${id}.json`, {
+  return async (dispatch, getState) => {
+    const token = getState().auth.token;
+
+    const response = await fetch(`${firebaseConfig.databaseURL}/products/${id}.json?auth=${token}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -118,10 +120,14 @@ export const updateProduct = (id, title, description, imageUrl) => {
       }),
     });
 
-    if (!response.ok)
+    if (!response.ok) {
+      const realErrorResp = await response.json();
+      console.log(realErrorResp);
+      
       throw new Error(
         'Algo deu errado na requisição! Tente outra vez mais tarde.'
       );
+    }
 
     dispatch({
       type: UPDATE_USER_PRODUCT,

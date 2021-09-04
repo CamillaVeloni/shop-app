@@ -37,10 +37,8 @@ export const signUp = (email, password) => {
 
     dispatch({
       type: STORING_USER,
-      payload: {
-        token: realResponse.idToken,
-        userId: realResponse.localId,
-      },
+      token: realResponse.idToken,
+      userId: realResponse.localId,
     });
   };
 };
@@ -79,14 +77,11 @@ export const signIn = (email, password) => {
     }
 
     const realResponse = await response.json();
-    console.log(realResponse);
 
     dispatch({
       type: STORING_USER,
-      payload: {
-        token: realResponse.idToken,
-        userId: realResponse.localId,
-      },
+      token: realResponse.idToken,
+      userId: realResponse.localId,
     });
   };
 };

@@ -1,2 +1,12 @@
-// URL do firebase
-export const BASE_URL = '';
+// Config firebase 
+
+export const firebaseConfig = {
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: "",
+  };

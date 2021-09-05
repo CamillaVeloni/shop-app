@@ -5,8 +5,10 @@ export const NEW_ORDER = 'newOrder';
 export const SET_ORDERS = 'setOrders';
 
 export const fetchOrders = () => {
-  return async (dispatch) => {
-    const response = await fetch(`${BASE_URL}/orders/u1.json`);
+  return async (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    
+    const response = await fetch(`${BASE_URL}/orders/${userId}.json`);
 
     try {
       if (!response.ok)
@@ -38,10 +40,13 @@ export const fetchOrders = () => {
 };
 
 export const addOrder = (cartItems, totalAmount) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    const token = getState().auth.token;
+
     const date = new Date();
 
-    const response = await fetch(`${BASE_URL}/orders/u1.json`, {
+    const response = await fetch(`${BASE_URL}/orders/${userId}.json?auth=${token}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

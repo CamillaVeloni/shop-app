@@ -7,10 +7,14 @@ export const UPDATE_USER_PRODUCT = 'updateProduct';
 export const SET_PRODUCTS = 'setProducts';
 
 export const fetchProducts = () => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
+    const userId = getState().auth.userId;
+
     try {
       // fetching data da API, verificando resposta e transformando de JSON para objeto javascript
-      const response = await fetch(`${firebaseConfig.databaseURL}/products.json`);
+      const response = await fetch(
+        `${firebaseConfig.databaseURL}/products.json`
+      );
       if (!response.ok) {
         // Pegando erro
         // pode também ver o que deu errado no container do response (body)
@@ -26,7 +30,7 @@ export const fetchProducts = () => {
         arrayData.push(
           new Product(
             key,
-            'u1',
+            data[key].ownerId,
             data[key].title,
             data[key].imageUrl,
             data[key].description,
@@ -38,7 +42,8 @@ export const fetchProducts = () => {
       // dispachando para redux
       dispatch({
         type: SET_PRODUCTS,
-        payload: arrayData,
+        userProducts: arrayData.filter((prod) => prod.ownerId === userId),
+        products: arrayData,
       });
     } catch (error) {
       // passar para custom analytics server
@@ -49,10 +54,15 @@ export const fetchProducts = () => {
 };
 
 export const deleteUserProduct = (productId) => {
-  return async (dispatch) => {
-    const response = await fetch(`${firebaseConfig.databaseURL}/products/${productId}.json`, {
-      method: 'DELETE',
-    });
+  return async (dispatch, getState) => {
+    const token = getState().auth.token;
+
+    const response = await fetch(
+      `${firebaseConfig.databaseURL}/products/${productId}.json?auth=${token}`,
+      {
+        method: 'DELETE',
+      }
+    );
 
     if (!response.ok)
       throw new Error(
@@ -67,20 +77,27 @@ export const deleteUserProduct = (productId) => {
 };
 
 export const createProduct = (title, description, imageUrl, price) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    const token = getState().auth.token;
+
     // Usando fetch para conectar com API
-    const response = await fetch(`${firebaseConfig.databaseURL}/products.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title,
-        description,
-        imageUrl,
-        price,
-      }),
-    });
+    const response = await fetch(
+      `${firebaseConfig.databaseURL}/products.json?auth=${token}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ownerId: userId,
+          title,
+          description,
+          imageUrl,
+          price,
+        }),
+      }
+    );
 
     if (!response.ok)
       throw new Error(
@@ -92,7 +109,8 @@ export const createProduct = (title, description, imageUrl, price) => {
     dispatch({
       type: CREATE_USER_PRODUCT,
       payload: {
-        id: respData.name,
+        prodId: respData.name,
+        ownerId: userId,
         title,
         description,
         imageUrl,
@@ -108,22 +126,25 @@ export const updateProduct = (id, title, description, imageUrl) => {
   return async (dispatch, getState) => {
     const token = getState().auth.token;
 
-    const response = await fetch(`${firebaseConfig.databaseURL}/products/${id}.json?auth=${token}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title,
-        description,
-        imageUrl,
-      }),
-    });
+    const response = await fetch(
+      `${firebaseConfig.databaseURL}/products/${id}.json?auth=${token}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          imageUrl,
+        }),
+      }
+    );
 
     if (!response.ok) {
       const realErrorResp = await response.json();
       console.log(realErrorResp);
-      
+
       throw new Error(
         'Algo deu errado na requisição! Tente outra vez mais tarde.'
       );

@@ -23,6 +23,7 @@ const OrdersScreen = () => {
     try {
       await dispatch(orderActions.fetchOrders());
     } catch (error) {
+      console.log(error);
       setError(error.message);
     }
 
@@ -33,14 +34,16 @@ const OrdersScreen = () => {
     loadOrders();
   }, [loadOrders, dispatch]);
 
+  // Mostrar spinner por enquanto que espera resposta da api
   if (loading) return <Spinner />;
 
+  // Mostrar componente de erro na página
   if (!loading && error) {
-    return <EmptyComponent text={error} />;
+    return <EmptyComponent text={error} retryButton onRetryPress={loadOrders}/>;
   }
-  if (!loading && userOrders.length === 0) {
-    return <EmptyComponent text="Você ainda não fez nenhum pedido!" />;
-  }
+  
+  // Mostrar componente se o usuário ainda não fez nenhum pedido
+  if (!loading && userOrders.length === 0) return <EmptyComponent text="Você ainda não fez nenhum pedido!" />;
 
   return (
     <FlatList

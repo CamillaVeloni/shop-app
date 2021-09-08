@@ -17,6 +17,8 @@ import DefaultText from '../../components/commons/DefaultText';
 import Colors from '../../constants/Colors';
 
 const CartScreen = () => {
+  const dispatch = useDispatch();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
 
@@ -37,17 +39,19 @@ const CartScreen = () => {
     // Usando sort para ajeitar ordem pelo id
     return transformedCart.sort((a, b) => (a.productId > b.productId ? 1 : -1));
   });
-  const dispatch = useDispatch();
 
+  // Usando useEffect para mostrar erro se for não possivel fazer pedido
   useEffect(() => {
     if (error) {
-      Alert.alert('', error, [{ text: 'Okay' }]);
+      Alert.alert('Um erro aconteceu!', error, [{ text: 'Okay' }]);    
     }
   }, [error]);
 
+  // Handler para fazer pedido
   const sendOrderHandler = async () => {
     setError(null);
     setLoading(true);
+
     try {
       await dispatch(ordersActions.addOrder(cartItems, cartTotalAmount));
     } catch (error) {

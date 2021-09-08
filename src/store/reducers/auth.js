@@ -1,4 +1,4 @@
-import { STORING_USER } from '../actions/auth';
+import { STORING_USER, LOGOUT } from '../actions/auth';
 
 const INITIAL_STATE = {
     token: null,
@@ -13,6 +13,8 @@ export default (state = INITIAL_STATE, action) => {
                 token: action.token,
                 userId: action.userId,
             }
+        case LOGOUT: 
+            return INITIAL_STATE;
         default: 
             return state;
     }

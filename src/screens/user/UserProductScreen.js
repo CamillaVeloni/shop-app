@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Platform, StyleSheet, Alert } from 'react-native';
+import { FlatList, Platform, Alert } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -8,6 +8,7 @@ import DefaultHeaderBtn from '../../components/commons/DefaultHeaderBtn';
 import DefaultBtn from '../../components/commons/DefaultBtn';
 import ProductItem from '../../components/shop/ProductItem';
 import Spinner from '../../components/commons/Spinner';
+import EmptyComponent from '../../components/shop/EmptyComponent';
 
 const UserProductScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,11 @@ const UserProductScreen = ({ navigation }) => {
 
   // Mostrando spinner
   if (loading) return <Spinner />;
+
+  // Mostrar mensagem se não tiver nenhum produto
+  if (!loading && userProducts.length === 0) {
+    return <EmptyComponent text="Você ainda não colocou nenhum produto para vender ainda!" />;
+  }
 
   return (
     <FlatList
@@ -103,7 +109,5 @@ UserProductScreen.navigationOptions = ({ navigation }) => {
     ),
   };
 };
-
-const styles = StyleSheet.create({});
 
 export default UserProductScreen;

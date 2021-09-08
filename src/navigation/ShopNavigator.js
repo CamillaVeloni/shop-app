@@ -1,11 +1,17 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, SafeAreaView, View } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import { createDrawerNavigator } from 'react-navigation-drawer';
+import {
+  createDrawerNavigator,
+  DrawerNavigatorItems,
+} from 'react-navigation-drawer';
 import { Ionicons } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+import DefaultBtn from '../components/commons/DefaultBtn';
 
 import Colors from '../constants/Colors';
+import StartupScreen from '../screens/StartupScreen';
 import AuthScreen from '../screens/user/AuthScreen';
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
@@ -13,6 +19,8 @@ import CartScreen from '../screens/shop/CartScreen';
 import OrdersScreen from '../screens/shop/OrdersScreen';
 import UserProductScreen from '../screens/user/UserProductScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
+
+import * as authActions from '../store/actions/auth';
 
 const defaultNavigationStyle = {
   headerStyle: {
@@ -38,13 +46,13 @@ const ProductsNavigator = createStackNavigator(
   {
     navigationOptions: {
       drawerLabel: 'Produtos',
-      drawerIcon: drawerConfig => (
+      drawerIcon: (drawerConfig) => (
         <Ionicons
           name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
           size={23}
           color={drawerConfig.tintColor}
         />
-      )
+      ),
     },
     defaultNavigationOptions: defaultNavigationStyle,
   }
@@ -72,8 +80,8 @@ const OrdersNavigator = createStackNavigator(
 const UserNavigator = createStackNavigator(
   {
     UserProducts: UserProductScreen,
-    EditProduct: EditProductScreen
-  }, 
+    EditProduct: EditProductScreen,
+  },
   {
     navigationOptions: {
       drawerLabel: 'Meus Produtos',
@@ -83,31 +91,53 @@ const UserNavigator = createStackNavigator(
           size={23}
           color={drawerConfig.tintColor}
         />
-      )
+      ),
     },
     defaultNavigationOptions: defaultNavigationStyle,
   }
-)
+);
 
 const ShopNavigator = createDrawerNavigator(
   {
     Products: ProductsNavigator,
     Orders: OrdersNavigator,
-    User: UserNavigator
+    User: UserNavigator,
   },
   {
     contentOptions: {
       activeTintColor: Colors.primaryColor,
     },
+    contentComponent: (props) => {
+      const dispatch = useDispatch();
+      
+      return (
+        <View style={{ flex: 1, paddingTop: 20 }}>
+          <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
+            <DrawerNavigatorItems {...props} />
+            <DefaultBtn
+              ownBtnStyle={{ alignSelf: 'center', paddingHorizontal: 30 }}
+              label="Sair do aplicativo"
+              onPress={() => {
+                dispatch(authActions.logOut());
+              }}
+            />
+          </SafeAreaView>
+        </View>
+      );
+    },
   }
 );
 
-const AuthNavigator = createStackNavigator({
-  Auth: AuthScreen,
-}, {
-  defaultNavigationOptions: defaultNavigationStyle,
-})
+const AuthNavigator = createStackNavigator(
+  {
+    Auth: AuthScreen,
+  },
+  {
+    defaultNavigationOptions: defaultNavigationStyle,
+  }
+);
 const MainNavigator = createSwitchNavigator({
+  Startup: StartupScreen,
   Auth: AuthNavigator,
   Shop: ShopNavigator,
 });

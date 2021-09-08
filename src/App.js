@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 import { LogBox } from 'react-native';
 
 //import { composeWithDevTools } from 'redux-devtools-extension'
-import ShopNavigator from './navigation/ShopNavigator';
+import NavigationContainer from './navigation/NavigationContainer';
 import RootReducer from './store/';
 
 const store = createStore(RootReducer, applyMiddleware(ReduxThunk));
@@ -23,7 +23,7 @@ export default function App() {
   if(!fontLoaded) return <AppLoading />
   return (
     <Provider store={store}>
-      <ShopNavigator />
+      <NavigationContainer />
     </Provider>
   );
 }

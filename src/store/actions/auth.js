@@ -1,5 +1,22 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { firebaseConfig } from '../../config';
+
 export const STORING_USER = 'storingUser';
+export const LOGOUT = 'logout';
+
+let timer;
+
+export const authenticate = (userId, token, expirationTime) => {
+  return (dispatch) => {
+    dispatch(setLogoutTimer(expirationTime));
+    dispatch({
+      type: STORING_USER,
+      userId,
+      token,
+    });
+  };
+};
 
 export const signUp = (email, password) => {
   return async (dispatch) => {
@@ -35,11 +52,21 @@ export const signUp = (email, password) => {
 
     const realResponse = await response.json();
 
-    dispatch({
-      type: STORING_USER,
-      token: realResponse.idToken,
-      userId: realResponse.localId,
-    });
+    dispatch(
+      authenticate(
+        realResponse.localId,
+        realResponse.idToken,
+        parseInt(realResponse.expiresIn) * 1000
+      )
+    );
+    const expirationDate = new Date(
+      new Date().getTime() + parseInt(realResponse.expiresIn) * 1000
+    );
+    savingUserStorage(
+      realResponse.idToken,
+      realResponse.localId,
+      expirationDate
+    );
   };
 };
 
@@ -77,11 +104,60 @@ export const signIn = (email, password) => {
     }
 
     const realResponse = await response.json();
+    // realResponse.expiresIn vem como segundos mas setLogoutTimer e authenticate só aceita milisegundos
+    dispatch(
+      authenticate(
+        realResponse.localId,
+        realResponse.idToken,
+        parseInt(realResponse.expiresIn) * 1000
+      )
+    );
 
-    dispatch({
-      type: STORING_USER,
-      token: realResponse.idToken,
-      userId: realResponse.localId,
-    });
+    const expirationDate = new Date(
+      new Date().getTime() + parseInt(realResponse.expiresIn) * 1000
+    );
+    savingUserStorage(
+      realResponse.idToken,
+      realResponse.localId,
+      expirationDate
+    );
   };
+};
+
+// Saindo do app: primeiro 'limpando' o timer, esvaziando userData do async storage e dps iniciando state auth
+export const logOut = () => {
+  clearLogoutTimer();
+  AsyncStorage.removeItem('userData');
+  return { type: LOGOUT };
+};
+
+const clearLogoutTimer = () => {
+  if (timer) {
+    // se timer existir então 'limpa'/'esvazia' ele
+    clearTimeout(timer);
+  }
+};
+
+// Timer para deslogar com expiration date
+const setLogoutTimer = (expirationTime) => {
+  // expirationTime tem que está em miliseconds!!
+  // É guardado o resultado do timeout na variavel 'timer' para qnd acontecer o logOut, ele ser removido
+  return (dispatch) => {
+    timer = setTimeout(() => {
+      dispatch(logOut());
+    }, expirationTime);
+  };
+};
+
+// Usando AsyncStorage para guardar token e userId ~~ https://reactnative.dev/docs/security
+// Obs: seguindo curso MAS o doc mostra que não se deve usar ele com Token storage e Secrets
+const savingUserStorage = (token, userId, expirationDate) => {
+  AsyncStorage.setItem(
+    'userData',
+    JSON.stringify({
+      token: token,
+      userId: userId,
+      expiresIn: expirationDate.toISOString(),
+    })
+  );
 };
